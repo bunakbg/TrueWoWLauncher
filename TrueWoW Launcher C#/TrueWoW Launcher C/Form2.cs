@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -50,50 +51,58 @@ namespace TrueWoW_Launcher
         {
             Environment.Exit(0);
         }
-
-        private void closeLabel_Click(object sender, EventArgs e)
-        {
-            Environment.Exit(0);
-        }
-
-        private void closeLabel_MouseHover(object sender, EventArgs e)
-        {
-            closeLabel.ForeColor = Color.White;
-        }
-
-        private void closeLabel_MouseLeave(object sender, EventArgs e)
-        {
-            closeLabel.ForeColor = Color.Gray;
-        }
-
-        private void playButton_MouseDown(object sender, MouseEventArgs e)
-        {
-            playButton.Location = new Point(playButton.Location.X + 1, playButton.Location.Y + 1);
-        }
-
-        private void playButton_MouseUp(object sender, MouseEventArgs e)
-        {
-            playButton.Location = new Point(playButton.Location.X - 1, playButton.Location.Y - 1);
-        }
-
         private void playButton_Click(object sender, EventArgs e)
         {
             MessageBox.Show("starting ...");
         }
 
-        private void closeLabel_MouseDown(object sender, MouseEventArgs e)
-        {
-            closeLabel.Location = new Point(closeLabel.Location.X + 1, closeLabel.Location.Y + 1);
-        }
-
-        private void closeLabel_MouseUp(object sender, MouseEventArgs e)
-        {
-            closeLabel.Location = new Point(closeLabel.Location.X - 1, closeLabel.Location.Y - 1);
-        }
-
         private void tueWowLogo_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("http://www.truewow.org");
+        }
+
+        private void mainForm_Shown(object sender, EventArgs e)
+        {
+            //MorpheusFont morpheusFont = new MorpheusFont();
+            //morpheusFont.Load();
+            //playButtonLabel.Font = new Font(morpheusFont.fontFamily(), 12, FontStyle.Regular);
+            playButtonHoover.Hide();
+            //playButton.Parent = playButtonHoover;
+            //playButton.Location = new Point(5, 9);
+        }
+
+        private void playButtonLabel_MouseHover(object sender, EventArgs e)
+        {
+            playButtonHoover.Hide();
+            playButton.Parent = playButtonHoover;
+            playButton.Location = new Point(5, 9);
+            //playButton.Image.
+        }
+
+        private void playButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            playButtonHoover.Location = new Point(playButtonHoover.Location.X + 1, playButtonHoover.Location.Y + 1);
+            //playButton.Location = new Point(playButton.Location.X + 1, playButton.Location.Y + 1);
+        }
+
+        private void playButton_MouseUp(object sender, MouseEventArgs e)
+        {
+            playButtonHoover.Location = new Point(playButtonHoover.Location.X - 1, playButtonHoover.Location.Y - 1);
+            //playButton.Location = new Point(playButton.Location.X - 1, playButton.Location.Y - 1);
+        }
+
+        private void playButton_MouseHover(object sender, EventArgs e)
+        {
+            playButtonHoover.Show();
+            playButton.Parent = playButtonHoover;
+            playButton.Location = new Point(5, 9);
+        }
+
+        private void playButton_MouseLeave(object sender, EventArgs e)
+        {
+            playButtonHoover.Hide();
+            playButton.Parent = mainForm.ActiveForm;
+            playButton.Location = new Point(537, 476);
         }
     }
 }
