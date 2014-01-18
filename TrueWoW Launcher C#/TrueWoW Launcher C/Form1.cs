@@ -65,7 +65,7 @@ namespace TrueWoW_Launcher
             }
             else
             {
-                MessageBox.Show("ok");
+                //MessageBox.Show("ok");
             }
             //check for update, read settings, find wow.exe etc.
         }

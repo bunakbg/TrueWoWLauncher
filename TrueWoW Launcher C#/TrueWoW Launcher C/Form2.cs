@@ -7,9 +7,13 @@ using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using WMPLib;
+using System.IO;
 
 //for DLL's
 using System.Runtime.InteropServices;
+using System.Media;
+
 
 namespace TrueWoW_Launcher
 {
@@ -51,10 +55,6 @@ namespace TrueWoW_Launcher
         {
             Environment.Exit(0);
         }
-        private void playButton_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("starting ...");
-        }
 
         private void tueWowLogo_Click(object sender, EventArgs e)
         {
@@ -66,22 +66,36 @@ namespace TrueWoW_Launcher
             //MorpheusFont morpheusFont = new MorpheusFont();
             //morpheusFont.Load();
             //playButtonLabel.Font = new Font(morpheusFont.fontFamily(), 12, FontStyle.Regular);
+
+            WMPLib.WindowsMediaPlayer player = new WMPLib.WindowsMediaPlayer();
+            player.URL = @Directory.GetCurrentDirectory() + "\\sound\\startup.mp3";
+            player.controls.play();
             playButtonHoover.Hide();
-            //playButton.Parent = playButtonHoover;
-            //playButton.Location = new Point(5, 9);
+            upArrowPicture.Parent = newsTextLabel;
+            upArrowPicture.Location = new Point(439, -2);
+            downArrowPicture.Parent = newsTextLabel;
+            downArrowPicture.Location = new Point(439, 72);
+
         }
 
         private void playButtonLabel_MouseHover(object sender, EventArgs e)
         {
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseOver.wav";
+            sPlayer.Play();
+
             playButtonHoover.Hide();
             playButton.Parent = playButtonHoover;
-            playButton.Location = new Point(5, 9);
+            playButton.Location = new Point(7, 11);
             //playButton.Image.
         }
 
         private void playButton_MouseDown(object sender, MouseEventArgs e)
         {
             playButtonHoover.Location = new Point(playButtonHoover.Location.X + 1, playButtonHoover.Location.Y + 1);
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\playButtonClick.wav";
+            sPlayer.Play();
             //playButton.Location = new Point(playButton.Location.X + 1, playButton.Location.Y + 1);
         }
 
@@ -95,14 +109,65 @@ namespace TrueWoW_Launcher
         {
             playButtonHoover.Show();
             playButton.Parent = playButtonHoover;
-            playButton.Location = new Point(5, 9);
+            playButton.Location = new Point(7, 11);
         }
 
         private void playButton_MouseLeave(object sender, EventArgs e)
         {
             playButtonHoover.Hide();
             playButton.Parent = mainForm.ActiveForm;
-            playButton.Location = new Point(537, 476);
+            playButton.Location = new Point(694, 476);
+        }
+
+        private void upArrowPicture_MouseDown(object sender, MouseEventArgs e)
+        {
+            upArrowPicture.Image = Image.FromFile(@Directory.GetCurrentDirectory() + "\\img\\upArrowDown.png");
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseClick.wav";
+            sPlayer.Play();
+        }
+
+        private void upArrowPicture_MouseUp(object sender, MouseEventArgs e)
+        {
+            upArrowPicture.Image = Image.FromFile(@Directory.GetCurrentDirectory() + "\\img\\upArrowUp.png");
+        }
+
+        private void downArrowPicture_MouseDown(object sender, MouseEventArgs e)
+        {
+            downArrowPicture.Image = Image.FromFile(@Directory.GetCurrentDirectory() + "\\img\\downArrowDown.png");
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseClick.wav";
+            sPlayer.Play();
+        }
+
+        private void downArrowPicture_MouseUp(object sender, MouseEventArgs e)
+        {
+            downArrowPicture.Image = Image.FromFile(@Directory.GetCurrentDirectory() + "\\img\\downArrowUp.png");
+        }
+
+        private void newsSelectorUnselected_Click(object sender, EventArgs e)
+        {
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\newsSelectorClick.wav";
+            sPlayer.Play();
+        }
+
+        private void menuButton1_MouseDown(object sender, MouseEventArgs e)
+        {
+            menuButton1.Location = new Point(menuButton1.Location.X + 1, menuButton1.Location.Y + 1);
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseClick.wav";
+            sPlayer.Play();
+        }
+
+        private void menuButton1_MouseUp(object sender, MouseEventArgs e)
+        {
+            menuButton1.Location = new Point(menuButton1.Location.X - 1, menuButton1.Location.Y - 1);
+        }
+
+        private void playButton_Click_1(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }
