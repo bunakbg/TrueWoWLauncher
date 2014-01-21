@@ -1,5 +1,5 @@
 <settings>
-  <wowPath>E:\gamez\World of Warcraft 3.3.5a (no install)\</wowPath>
+  <wowPath>null</wowPath>
   <server>truewowlauncher.netii.net</server>
   <startUpSound>true</startUpSound>
   <minimizeToTray>false</minimizeToTray>
