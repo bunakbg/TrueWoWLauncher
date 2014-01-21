@@ -31,6 +31,8 @@ namespace TrueWoW_Launcher
            
         }
 
+        ReadSettingsFile settingsFile = new ReadSettingsFile();
+
         //const and dll functions for moving form
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
@@ -63,26 +65,40 @@ namespace TrueWoW_Launcher
 
         private void mainForm_Shown(object sender, EventArgs e)
         {
+            //morhpeus font for prettier labels. not mandatory
             //MorpheusFont morpheusFont = new MorpheusFont();
             //morpheusFont.Load();
             //playButtonLabel.Font = new Font(morpheusFont.fontFamily(), 12, FontStyle.Regular);
+            settingsFile.Read();
+            if (settingsFile.startUpSound() == true)
+            {
+                WMPLib.WindowsMediaPlayer player = new WMPLib.WindowsMediaPlayer();
+                player.URL = @Directory.GetCurrentDirectory() + "\\sound\\startup.mp3";
+                player.controls.play();
+            }
 
-            WMPLib.WindowsMediaPlayer player = new WMPLib.WindowsMediaPlayer();
-            player.URL = @Directory.GetCurrentDirectory() + "\\sound\\startup.mp3";
-            player.controls.play();
+            //change control properties on runtime
             playButtonHoover.Hide();
             upArrowPicture.Parent = newsTextLabel;
             upArrowPicture.Location = new Point(439, -2);
             downArrowPicture.Parent = newsTextLabel;
             downArrowPicture.Location = new Point(439, 72);
 
+            trayIcon.BalloonTipTitle = "TrueWoW Launcher";
+            trayIcon.BalloonTipText = "Launcher minimized to tray. Right click icon for menu.";
+            if (settingsFile.minimizeToTray() == true)
+            {
+                trayIcon.Visible = true;
+            }
+            else
+            {
+                trayIcon.Visible = false;
+            }
         }
 
         private void playButtonLabel_MouseHover(object sender, EventArgs e)
         {
-            SoundPlayer sPlayer = new SoundPlayer();
-            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseOver.wav";
-            sPlayer.Play();
+            MouseOverSound();
 
             playButtonHoover.Hide();
             playButton.Parent = playButtonHoover;
@@ -155,9 +171,7 @@ namespace TrueWoW_Launcher
         private void menuButton1_MouseDown(object sender, MouseEventArgs e)
         {
             menuButton1.Location = new Point(menuButton1.Location.X + 1, menuButton1.Location.Y + 1);
-            SoundPlayer sPlayer = new SoundPlayer();
-            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseClick.wav";
-            sPlayer.Play();
+            MouseClickSound();
         }
 
         private void menuButton1_MouseUp(object sender, MouseEventArgs e)
@@ -165,9 +179,177 @@ namespace TrueWoW_Launcher
             menuButton1.Location = new Point(menuButton1.Location.X - 1, menuButton1.Location.Y - 1);
         }
 
+        private void menuButton1_MouseHover(object sender, EventArgs e)
+        {
+            MouseOverSound();
+        }
+
+        private void menuButton1_Click(object sender, EventArgs e)
+        {
+            var activeForm = Form.ActiveForm;
+            using (var dlg = new mainForm())
+            {
+                dlg.FormClosing += delegate { activeForm.Show(); };
+                //activeForm.Hide();
+            }
+            Form3 settingsForm = new Form3();
+            settingsForm.ShowDialog(this);
+        }
+
+        private void menuButton2_MouseDown(object sender, MouseEventArgs e)
+        {
+            menuButton2.Location = new Point(menuButton2.Location.X + 1, menuButton2.Location.Y + 1);
+            MouseClickSound();
+        }
+
+        private void menuButton2_MouseUp(object sender, MouseEventArgs e)
+        {
+            menuButton2.Location = new Point(menuButton2.Location.X - 1, menuButton2.Location.Y - 1);
+        }
+
+        private void menuButton2_MouseHover(object sender, EventArgs e)
+        {
+            MouseOverSound();
+        }
+
+        private void menuButton3_MouseDown(object sender, MouseEventArgs e)
+        {
+            menuButton3.Location = new Point(menuButton3.Location.X + 1, menuButton3.Location.Y + 1);
+            MouseClickSound();
+        }
+
+        private void menuButton3_MouseUp(object sender, MouseEventArgs e)
+        {
+            menuButton3.Location = new Point(menuButton3.Location.X - 1, menuButton3.Location.Y - 1);
+        }
+
+        private void menuButton3_MouseHover(object sender, EventArgs e)
+        {
+            MouseOverSound();
+        }
+
+        private void menuButton4_MouseDown(object sender, MouseEventArgs e)
+        {
+            menuButton4.Location = new Point(menuButton4.Location.X + 1, menuButton4.Location.Y + 1);
+            MouseClickSound();
+        }
+
+        private void menuButton4_MouseUp(object sender, MouseEventArgs e)
+        {
+            menuButton4.Location = new Point(menuButton4.Location.X - 1, menuButton4.Location.Y - 1);
+        }
+
+        private void menuButton4_MouseHover(object sender, EventArgs e)
+        {
+            MouseOverSound();
+        }
+
+        private void menuButton5_MouseDown(object sender, MouseEventArgs e)
+        {
+            menuButton5.Location = new Point(menuButton5.Location.X + 1, menuButton5.Location.Y + 1);
+            MouseClickSound();
+        }
+
+        private void menuButton5_MouseUp(object sender, MouseEventArgs e)
+        {
+            menuButton5.Location = new Point(menuButton5.Location.X - 1, menuButton5.Location.Y - 1);
+        }
+
+        private void menuButton5_MouseHover(object sender, EventArgs e)
+        {
+            MouseOverSound();
+        }
+
+        private void menuButton6_MouseDown(object sender, MouseEventArgs e)
+        {
+            menuButton6.Location = new Point(menuButton6.Location.X + 1, menuButton6.Location.Y + 1);
+            MouseClickSound();
+        }
+
+        private void menuButton6_MouseUp(object sender, MouseEventArgs e)
+        {
+            menuButton6.Location = new Point(menuButton6.Location.X - 1, menuButton6.Location.Y - 1);
+        }
+
+        private void menuButton6_MouseHover(object sender, EventArgs e)
+        {
+            MouseOverSound();
+        }
+
         private void playButton_Click_1(object sender, EventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private void closeButton_MouseHover(object sender, EventArgs e)
+        {
+            closeButton.Location = new Point(closeButton.Location.X - 2, closeButton.Location.Y - 2);
+            closeButton.Size = new Size(closeButton.Size.Width + 4, closeButton.Size.Height + 4);
+        }
+
+        private void closeButton_MouseLeave(object sender, EventArgs e)
+        {
+            closeButton.Size = new Size(32, 32);
+            closeButton.Location = new Point(1086, 28);
+        }
+
+        private void closeButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            closeButton.Location = new Point(closeButton.Location.X + 1, closeButton.Location.Y + 1);
+        }
+
+        private void closeButton_MouseUp(object sender, MouseEventArgs e)
+        {
+            closeButton.Location = new Point(closeButton.Location.X - 1, closeButton.Location.Y - 1);
+        }
+
+        private void closeButton_Click(object sender, EventArgs e)
+        {
+            settingsFile.Read();
+            if (settingsFile.minimizeToTray() == true)
+            {
+                this.Hide();
+                trayIcon.Visible = true;
+                trayIcon.ShowBalloonTip(1000);
+            }
+            else
+            {
+                trayIcon.Visible = false;
+                Environment.Exit(0);
+            }
+        }
+
+        private void MouseOverSound()
+        {
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseOver.wav";
+            sPlayer.Play();
+        }
+        private void MouseClickSound()
+        {
+            SoundPlayer sPlayer = new SoundPlayer();
+            sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\mouseClick.wav";
+            sPlayer.Play();
+        }
+
+        private void trayMenuExit_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void trayMenuShowLauncher_Click(object sender, EventArgs e)
+        {
+            this.Show();
+        }
+
+        private void trayMenuCheckForUpdate_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("In development ...");
+        }
+
+        private void trayIcon_DoubleClick(object sender, EventArgs e)
+        {
+            this.Show();
         }
     }
 }
