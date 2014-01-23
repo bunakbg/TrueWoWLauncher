@@ -23,6 +23,7 @@ namespace TrueWoW_Launcher
             {
                 _xmlReader.Load(@Directory.GetCurrentDirectory() + "\\" + _settingsFileLocation);
             }
+            //file not found
             catch (FileNotFoundException)
             {
                 DialogResult answer = MessageBox.Show("ERROR: localsettings.xml not found in: \n\n '" + Directory.GetCurrentDirectory() + "\\' \n\n Re-download TrueWoW Launcher from http://www.truewow.org/ ?", "Error!", MessageBoxButtons.YesNo);
@@ -37,31 +38,10 @@ namespace TrueWoW_Launcher
                 }
 
             }
-            catch (UnauthorizedAccessException)
+            //dir not found
+            catch (DirectoryNotFoundException)
             {
-                MessageBox.Show("ERROR: no read/write access to localsettings.xml in: \n\n '" + Directory.GetCurrentDirectory() + "\\' \n\n Re-run Launcher with Administrator privileges please.", "Error!");
-                Environment.Exit(0);
-            }
-        }
-
-        public void SetWoWPath(string _wowPath, string _settingsFileLocation = "localsettings.xml")
-        {
-            //create node and append
-            //XmlElement another = _xmlReader.CreateElement("another");
-            //_parrentRootXML.AppendChild(_wowPathXML);
-            //_parrentRootXML = _xmlReader.SelectSingleNode("/settings");
-            
-            _wowPathXML = _xmlReader.SelectSingleNode("/settings/wowPath");
-            _wowPathXML.InnerText = _wowPath;
-            
-            try
-            {
-                _xmlReader.Save(@Directory.GetCurrentDirectory() + "\\" + _settingsFileLocation);
-            }
-            //file not found
-            catch (FileNotFoundException)
-            {
-                DialogResult answer = MessageBox.Show("ERROR: localsettings.xml not found in: \n\n '" + Directory.GetCurrentDirectory() + "\\' \n\n Re-download TrueWoW Launcher from http://www.truewow.org/ ?", "Error!", MessageBoxButtons.YesNo);
+                DialogResult answer = MessageBox.Show("ERROR: localsettings.xml not found in: \n\n'" + Directory.GetCurrentDirectory() + "\\'. \n\n Re-download TrueWoW Launcher from http://www.truewow.org/ ?", "Error!", MessageBoxButtons.YesNo);
                 if (answer == DialogResult.No)
                 {
                     Environment.Exit(0);
@@ -79,7 +59,20 @@ namespace TrueWoW_Launcher
                 Environment.Exit(0);
             }
         }
-        public void SetStartUpSound(bool _startUpSoundBool = false, string _settingsFileLocation = "localsettings.xml")
+
+        public void SetWoWPath(string _wowPath)
+        {
+            //create node and append
+            //XmlElement another = _xmlReader.CreateElement("another");
+            //_parrentRootXML.AppendChild(_wowPathXML);
+            //_parrentRootXML = _xmlReader.SelectSingleNode("/settings");
+            
+            _wowPathXML = _xmlReader.SelectSingleNode("/settings/wowPath");
+            _wowPathXML.InnerText = _wowPath;
+
+            SaveXML();
+        }
+        public void SetStartUpSound(bool _startUpSoundBool = false)
         {
             //create node and append
             //XmlElement another = _xmlReader.CreateElement("another");
@@ -96,6 +89,29 @@ namespace TrueWoW_Launcher
                 _startUpSoundXML.InnerText = "false";
             }
 
+            SaveXML();
+        }
+        public void MinimizeToTray(bool _minimizeToTray = false)
+        {
+            //create node and append
+            //XmlElement another = _xmlReader.CreateElement("another");
+            //_parrentRootXML.AppendChild(_wowPathXML);
+            //_parrentRootXML = _xmlReader.SelectSingleNode("/settings");
+
+            _minimizeToTrayXML = _xmlReader.SelectSingleNode("/settings/minimizeToTray");
+            if (_minimizeToTray == true)
+            {
+                _minimizeToTrayXML.InnerText = "true";
+            }
+            else
+            {
+                _minimizeToTrayXML.InnerText = "false";
+            }
+
+            SaveXML();
+        }
+        private void SaveXML(string _settingsFileLocation = "localsettings.xml")
+        {
             try
             {
                 _xmlReader.Save(@Directory.GetCurrentDirectory() + "\\" + _settingsFileLocation);
@@ -114,38 +130,10 @@ namespace TrueWoW_Launcher
                     Environment.Exit(0);
                 }
             }
-            //no access
-            catch (UnauthorizedAccessException)
+            //dir not found
+            catch (DirectoryNotFoundException)
             {
-                MessageBox.Show("ERROR: no read/write access to localsettings.xml in: \n\n '" + Directory.GetCurrentDirectory() + "\\' \n\n Re-run Launcher with Administrator privileges please.", "Error!");
-                Environment.Exit(0);
-            }
-        }
-        public void MinimizeToTray(bool _minimizeToTray = false, string _settingsFileLocation = "localsettings.xml")
-        {
-            //create node and append
-            //XmlElement another = _xmlReader.CreateElement("another");
-            //_parrentRootXML.AppendChild(_wowPathXML);
-            //_parrentRootXML = _xmlReader.SelectSingleNode("/settings");
-
-            _minimizeToTrayXML = _xmlReader.SelectSingleNode("/settings/minimizeToTray");
-            if (_minimizeToTray == true)
-            {
-                _minimizeToTrayXML.InnerText = "true";
-            }
-            else
-            {
-                _minimizeToTrayXML.InnerText = "false";
-            }
-
-            try
-            {
-                _xmlReader.Save(@Directory.GetCurrentDirectory() + "\\" + _settingsFileLocation);
-            }
-            //file not found
-            catch (FileNotFoundException)
-            {
-                DialogResult answer = MessageBox.Show("ERROR: localsettings.xml not found in: \n\n '" + Directory.GetCurrentDirectory() + "\\' \n\n Re-download TrueWoW Launcher from http://www.truewow.org/ ?", "Error!", MessageBoxButtons.YesNo);
+                DialogResult answer = MessageBox.Show("ERROR: localsettings.xml not found in: \n\n'" + Directory.GetCurrentDirectory() + "\\'. \n\n Re-download TrueWoW Launcher from http://www.truewow.org/ ?", "Error!", MessageBoxButtons.YesNo);
                 if (answer == DialogResult.No)
                 {
                     Environment.Exit(0);

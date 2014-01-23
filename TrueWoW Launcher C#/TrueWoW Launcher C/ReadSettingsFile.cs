@@ -42,6 +42,20 @@ namespace TrueWoW_Launcher
                 }
 
             }
+            //dir not found
+            catch (DirectoryNotFoundException)
+            {
+                DialogResult answer = MessageBox.Show("ERROR: localsettings.xml not found in: \n\n'" + Directory.GetCurrentDirectory() + "\\'. \n\n Re-download TrueWoW Launcher from http://www.truewow.org/ ?", "Error!", MessageBoxButtons.YesNo);
+                if (answer == DialogResult.No)
+                {
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    System.Diagnostics.Process.Start("http://www.truewow.org");
+                    Environment.Exit(0);
+                }
+            }
             //no access
             catch (UnauthorizedAccessException)
             {

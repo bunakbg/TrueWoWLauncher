@@ -12,24 +12,37 @@ using System.Net.NetworkInformation;
 
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Threading;
+using System.Reflection;
 namespace TrueWoW_Launcher
 {
     public partial class updateForm : Form
     {
+
+        private delegate void SetControlPropertyThreadSafeDelegate(Control control, string propertyName, object propertyValue);
+
         ReadSettingsFile settingsFile = new ReadSettingsFile();
+
         double currentVersion = 0.1;
         double serverVersion = 0;
-
+        bool labelUpdateLoopRun = true;
+        int updateLabelStep = 1;
+        
         public updateForm()
         {
             InitializeComponent();
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            backgroundWorker1.CancelAsync();
-            Environment.Exit(0);
+            if (updateLabelStep == 1)
+            {
+                Environment.Exit(0);
+            }
+            else
+            {
+                ShowMain();
+            }
         }
-
         public static bool PingHost(string nameOrAddress)
         {
             bool pingable = false;
@@ -67,15 +80,17 @@ namespace TrueWoW_Launcher
                 MessageBox.Show("ERROR: {0} or Your internet connectionis down. Exiting ...", settingsFile.serverAddress());
                 Environment.Exit(0);
             }
+            statusLabel.Text = "checking for update";
             this.Refresh();
 
             //check for update
-            backgroundWorker1.RunWorkerAsync();
+            updateLabelLoopWorker.RunWorkerAsync();
+            updateBackgroundDownloader.RunWorkerAsync();  
         }
 
         private void ShowMain()
         {
-            var activeForm = Form.ActiveForm;
+            var activeForm = this;
             using (var dlg = new mainForm())
             {
                 dlg.FormClosing += delegate { activeForm.Show(); };
@@ -83,47 +98,150 @@ namespace TrueWoW_Launcher
             }
             mainForm mainForm = new mainForm();
             mainForm.Show();
-        }
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        }    
+
+        private void updateLabelLoopWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            backgroundWorker1.ReportProgress(0);
+            int loopCount = 0;
+            while (labelUpdateLoopRun == true)
+            {
+                loopCount++;
+                if (loopCount > 3) { loopCount = 1; }
+                updateLabelLoopWorker.ReportProgress(loopCount);
+                System.Threading.Thread.Sleep(150);
+            }
+        }
+
+        private void updateLabelLoopWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (updateLabelStep == 1)
+            {
+                if (e.ProgressPercentage == 1) { statusLabel.Text = "checking for update ."; }
+                if (e.ProgressPercentage == 2) { statusLabel.Text = "checking for update .."; }
+                if (e.ProgressPercentage == 3) { statusLabel.Text = "checking for update ..."; }
+            }
+            else if (updateLabelStep == 2)
+            {
+                if (e.ProgressPercentage == 1) { statusLabel.Text = "downloading news ."; }
+                if (e.ProgressPercentage == 2) { statusLabel.Text = "downloading news .."; }
+                if (e.ProgressPercentage == 3) { statusLabel.Text = "downloading news ..."; }
+            }     
+        } 
+
+        private void _dlClientUpdate_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            Thread.Sleep(10);
+            //progressBar1.Value = e.ProgressPercentage;
+            SetControlPropertyThreadSafe(progressBar1, "Value", e.ProgressPercentage);
+            //if (e.ProgressPercentage == 100) { MessageBox.Show("100"); }
+        }
+
+        private void _dlClientNews_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            Thread.Sleep(10);
+            //progressBar1.Value = e.ProgressPercentage;
+            SetControlPropertyThreadSafe(progressBar1, "Value", e.ProgressPercentage);
+        }
+
+        public static void SetControlPropertyThreadSafe(Control control, string propertyName, object propertyValue)
+        {
+            if (control.InvokeRequired)
+            {
+                control.Invoke(new SetControlPropertyThreadSafeDelegate(SetControlPropertyThreadSafe), new object[] { control, propertyName, propertyValue });
+            }
+            else
+            {
+                control.GetType().InvokeMember(propertyName, BindingFlags.SetProperty, null, control, new object[] { propertyValue });
+            }
+        }
+
+        private void updateBackgroundDownloader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            updateLabelLoopWorker.CancelAsync();
+            labelUpdateLoopRun = false;
+            statusLabel.Text = "reading update ...";
+
+            if (serverVersion == 0)
+            {
+                FileStream fs = File.OpenRead(@Directory.GetCurrentDirectory() + "\\update.txt");
+                BinaryReader reader = new BinaryReader(fs);
+                //MessageBox.Show(serverVersion.ToString());
+            }
+            if (serverVersion > currentVersion)
+            {
+                statusLabel.Text = "new update found!";
+                //MessageBox.Show("new ver ava");
+            }
+            else
+            {
+                statusLabel.Text = "up to date!";
+                progressBar1.Value = 100;
+                //MessageBox.Show("up tu date");
+            }
+
+            this.Refresh();
+            updateLabelStep = 2;
+            labelUpdateLoopRun = true;
+
+            newsBackgroundDownloader.RunWorkerAsync();
+
+            while (updateLabelLoopWorker.IsBusy == true)
+            {
+                Application.DoEvents();
+            }
+            updateLabelLoopWorker.RunWorkerAsync();
+        }
+
+        private void updateBackgroundDownloader_DoWork(object sender, DoWorkEventArgs e)
+        {
             settingsFile.Read();
+
             WebClient _dlClient = new WebClient();
+            _dlClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(_dlClientUpdate_DownloadProgressChanged);
+
             try
             {
-                _dlClient.DownloadFile("http://" + settingsFile.serverAddress() + "/launcher/update.xml", @Directory.GetCurrentDirectory() + "\\update.txt");
-                backgroundWorker1.ReportProgress(50);
+                _dlClient.DownloadFileAsync(new Uri("http://" + settingsFile.serverAddress() + "/launcher/update.xml"), @Directory.GetCurrentDirectory() + "\\update.txt");
             }
             catch (WebException)
             {
                 MessageBox.Show("ERROR: can't download update.xml from \n\n " + settingsFile.serverAddress() + " \n\n Concidering it's up to date.");
                 serverVersion = currentVersion;
             }
-            backgroundWorker1.ReportProgress(100);
-       }
-
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            statusLabel.Text = "checking for update ...";
-            progressBar1.Value = e.ProgressPercentage;
+            //sleep thread untill _dlClient finishes, cause worker finishes before _dbClient and file is still not d/l-ed ot locked.
+            while (_dlClient.IsBusy)
+            {
+                Thread.Sleep(10);
+            }
         }
 
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void newsBackgroundDownloader_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (serverVersion == 0)
+            settingsFile.Read();
+
+            WebClient _dlClient = new WebClient();
+            _dlClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(_dlClientNews_DownloadProgressChanged);
+            try
             {
-                Double.TryParse(File.ReadAllText(@Directory.GetCurrentDirectory() + "\\update.txt"), out serverVersion);
-                //MessageBox.Show(serverVersion);
+                _dlClient.DownloadFileAsync(new Uri("http://" + settingsFile.serverAddress() + "/launcher/news.zip"), @Directory.GetCurrentDirectory() + "\\news\\news.zip");
             }
-            if (serverVersion > currentVersion)
+            catch (WebException)
             {
-                MessageBox.Show("new ver ava");
+                MessageBox.Show("ERROR: can't download update.xml from \n\n " + settingsFile.serverAddress() + " \n\n Concidering it's up to date.");
+                serverVersion = currentVersion;
             }
-            else
+            //sleep thread untill _dlClient finishes, cause worker finishes before _dbClient and file is still not d/l-ed ot locked.
+            while (_dlClient.IsBusy)
             {
-                MessageBox.Show("up tu date");
+                Thread.Sleep(10);
             }
-            ShowMain();
+        }
+
+        private void newsBackgroundDownloader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            updateLabelLoopWorker.CancelAsync();
+            labelUpdateLoopRun = false;
+            ShowMain();         
         }
     }
 }

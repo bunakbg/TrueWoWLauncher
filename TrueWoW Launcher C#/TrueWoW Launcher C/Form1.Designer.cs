@@ -32,7 +32,9 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.button1 = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.updateLabelLoopWorker = new System.ComponentModel.BackgroundWorker();
+            this.updateBackgroundDownloader = new System.ComponentModel.BackgroundWorker();
+            this.newsBackgroundDownloader = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // progressBar1
@@ -59,23 +61,40 @@
             this.statusLabel.Size = new System.Drawing.Size(447, 14);
             this.statusLabel.TabIndex = 2;
             // 
-            // backgroundWorker1
+            // updateLabelLoopWorker
             // 
-            this.backgroundWorker1.WorkerReportsProgress = true;
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            this.updateLabelLoopWorker.WorkerReportsProgress = true;
+            this.updateLabelLoopWorker.WorkerSupportsCancellation = true;
+            this.updateLabelLoopWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.updateLabelLoopWorker_DoWork);
+            this.updateLabelLoopWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.updateLabelLoopWorker_ProgressChanged);
+            // 
+            // updateBackgroundDownloader
+            // 
+            this.updateBackgroundDownloader.WorkerReportsProgress = true;
+            this.updateBackgroundDownloader.WorkerSupportsCancellation = true;
+            this.updateBackgroundDownloader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.updateBackgroundDownloader_DoWork);
+            this.updateBackgroundDownloader.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.updateBackgroundDownloader_RunWorkerCompleted);
+            // 
+            // newsBackgroundDownloader
+            // 
+            this.newsBackgroundDownloader.WorkerReportsProgress = true;
+            this.newsBackgroundDownloader.WorkerSupportsCancellation = true;
+            this.newsBackgroundDownloader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.newsBackgroundDownloader_DoWork);
+            this.newsBackgroundDownloader.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.newsBackgroundDownloader_RunWorkerCompleted);
             // 
             // updateForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(525, 58);
+            this.ControlBox = false;
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.progressBar1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "updateForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "TrueWoW Launcher";
@@ -89,7 +108,9 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label statusLabel;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.ComponentModel.BackgroundWorker updateLabelLoopWorker;
+        private System.ComponentModel.BackgroundWorker updateBackgroundDownloader;
+        private System.ComponentModel.BackgroundWorker newsBackgroundDownloader;
     }
 }
 

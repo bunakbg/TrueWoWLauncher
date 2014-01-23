@@ -9,11 +9,11 @@ using System.Text;
 using System.Windows.Forms;
 using WMPLib;
 using System.IO;
+using System.IO.Compression;
 
 //for DLL's
 using System.Runtime.InteropServices;
 using System.Media;
-
 
 namespace TrueWoW_Launcher
 {
@@ -28,10 +28,18 @@ namespace TrueWoW_Launcher
 
         private void mainForm_Load(object sender, EventArgs e)
         {
-           
+            
         }
 
+        News readedNews = new News();
         ReadSettingsFile settingsFile = new ReadSettingsFile();
+        int newsSelectorHistory = 0;
+        public List<Label> newsSelector = new List<Label>();
+
+        //SereniaBLPLib.BlpFile blpLoader;
+        //Bitmap loadedBLP;
+        //Bitmap playButtonBitmap;
+
 
         //const and dll functions for moving form
         public const int WM_NCLBUTTONDOWN = 0xA1;
@@ -69,6 +77,7 @@ namespace TrueWoW_Launcher
             //MorpheusFont morpheusFont = new MorpheusFont();
             //morpheusFont.Load();
             //playButtonLabel.Font = new Font(morpheusFont.fontFamily(), 12, FontStyle.Regular);
+
             settingsFile.Read();
             if (settingsFile.startUpSound() == true)
             {
@@ -79,10 +88,10 @@ namespace TrueWoW_Launcher
 
             //change control properties on runtime
             playButtonHoover.Hide();
-            upArrowPicture.Parent = newsTextLabel;
-            upArrowPicture.Location = new Point(439, -2);
-            downArrowPicture.Parent = newsTextLabel;
-            downArrowPicture.Location = new Point(439, 72);
+            //upArrowPicture.Parent = newsTextLabel;
+            //upArrowPicture.Location = new Point(436, -2);
+            //downArrowPicture.Parent = newsTextLabel;
+            //downArrowPicture.Location = new Point(436, 73);
 
             trayIcon.BalloonTipTitle = "TrueWoW Launcher";
             trayIcon.BalloonTipText = "Launcher minimized to tray. Right click icon for menu.";
@@ -94,6 +103,108 @@ namespace TrueWoW_Launcher
             {
                 trayIcon.Visible = false;
             }
+            #region BLP-TEST
+            //try
+            //{
+            //    if (this.blpLoader != null)
+            //    {
+            //        this.blpLoader.close();
+            //        this.blpLoader = null;
+            //    }
+
+            //    FileStream file = new FileStream("example.blp", FileMode.Open);
+            //    this.blpLoader = new SereniaBLPLib.BlpFile(file);
+                
+
+
+
+                
+            //    // loading bitmap level 0
+            //    loadedBLP = this.blpLoader.getBitmap(0);
+            //    Rectangle imgDimensions = new Rectangle();
+            //    imgDimensions.Location = new Point(50, 15);
+            //    imgDimensions.Width = 155;
+            //    imgDimensions.Height = 32;
+
+            //    playButtonBitmap = loadedBLP.Clone(imgDimensions, loadedBLP.PixelFormat);
+            //    playButton.Image = playButtonBitmap;
+
+            //    if (this.blpLoader != null)
+            //    {
+            //        this.blpLoader.close();
+            //        this.blpLoader = null;
+            //    }
+
+            //    file.Close();
+            //    file = new FileStream("Glues-BigButton-Glow.blp", FileMode.Open);
+            //    this.blpLoader = new SereniaBLPLib.BlpFile(file);
+
+            //    loadedBLP = this.blpLoader.getBitmap(0);
+            //    imgDimensions = new Rectangle();
+            //    imgDimensions.Location = new Point(43, 7);
+            //    imgDimensions.Width = 170;
+            //    imgDimensions.Height = 50;
+
+            //    playButtonBitmap = loadedBLP.Clone(imgDimensions, loadedBLP.PixelFormat);
+            //    playButtonHoover.Image = playButtonBitmap;
+
+            //}
+            //catch (FileNotFoundException fe)
+            //{
+            //    MessageBox.Show("The 'example.blp' was not found!");
+            //}
+            #endregion
+
+            //read data inside zip
+            ZipStorer newsZIP = ZipStorer.Open(@Directory.GetCurrentDirectory() + "\\news\\news.zip", FileAccess.Read);
+
+            // Read all directory contents
+            List<ZipStorer.ZipFileEntry> dir = newsZIP.ReadCentralDir();
+
+            // Extract all files in target directory
+            string path;
+            bool result;
+            foreach (ZipStorer.ZipFileEntry entry in dir)
+            {
+                path = Path.Combine(@Directory.GetCurrentDirectory() + "\\news\\", Path.GetFileName(entry.FilenameInZip));
+                result = newsZIP.ExtractFile(entry, path);
+            }
+            newsZIP.Close();
+
+            this.Refresh();
+
+            readedNews.Read();
+
+            
+            
+            for (int i = 0; i < readedNews.newsCount(); i++)
+            {
+                Label tmpControl = new Label();
+                if (i == 0)
+                {
+                    tmpControl.BackColor = System.Drawing.Color.Aqua;
+                }
+                else
+                {
+                    tmpControl.BackColor = System.Drawing.Color.Gray;
+                }
+                tmpControl.Cursor = System.Windows.Forms.Cursors.Hand;
+                tmpControl.Name = "newsSelector" + i.ToString();
+                //tmpControl. = "newsSelector" + i.ToString();
+                tmpControl.Size = new System.Drawing.Size(10, 10);
+                tmpControl.Click += new System.EventHandler(this.newsSelectorSelected_Click);
+                this.Controls.Add(tmpControl);
+                tmpControl.Parent = this.newsPicture;
+                tmpControl.Location = new System.Drawing.Point((3 + (i * 16)), 3);
+                newsSelector.Add(tmpControl);
+            }
+
+            newsPicture.ImageLocation = @Directory.GetCurrentDirectory() + "\\news\\" + readedNews.newsImg(0);
+            newsTittleLabel.Text = readedNews.newsTittle(0);
+            newsTextLabel.Text = readedNews.newsText(0);
+            newsSelectorHistory = 0;
+
+            newsLoopWorker.RunWorkerAsync();
         }
 
         private void playButtonLabel_MouseHover(object sender, EventArgs e)
@@ -131,7 +242,7 @@ namespace TrueWoW_Launcher
         private void playButton_MouseLeave(object sender, EventArgs e)
         {
             playButtonHoover.Hide();
-            playButton.Parent = mainForm.ActiveForm;
+            playButton.Parent = this;
             playButton.Location = new Point(694, 476);
         }
 
@@ -161,11 +272,25 @@ namespace TrueWoW_Launcher
             downArrowPicture.Image = Image.FromFile(@Directory.GetCurrentDirectory() + "\\img\\downArrowUp.png");
         }
 
-        private void newsSelectorUnselected_Click(object sender, EventArgs e)
+        private void newsSelectorSelected_Click(object sender, EventArgs e)
         {
             SoundPlayer sPlayer = new SoundPlayer();
             sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\newsSelectorClick.wav";
             sPlayer.Play();
+
+            readedNews.Read();
+
+            newsSelector[newsSelectorHistory].BackColor = Color.Gray;
+
+            Label senderLabel = (Label)sender;
+            int controlNo = int.Parse(senderLabel.Name.Replace("newsSelector", ""));
+            senderLabel.BackColor = Color.Aqua;
+
+            newsPicture.ImageLocation = @Directory.GetCurrentDirectory() + "\\news\\" + readedNews.newsImg(controlNo);
+            newsTittleLabel.Text = readedNews.newsTittle(controlNo);
+            newsTextLabel.Text = readedNews.newsText(controlNo);
+
+            newsSelectorHistory = controlNo;
         }
 
         private void menuButton1_MouseDown(object sender, MouseEventArgs e)
@@ -186,7 +311,7 @@ namespace TrueWoW_Launcher
 
         private void menuButton1_Click(object sender, EventArgs e)
         {
-            var activeForm = Form.ActiveForm;
+            var activeForm = this;
             using (var dlg = new mainForm())
             {
                 dlg.FormClosing += delegate { activeForm.Show(); };
@@ -278,7 +403,19 @@ namespace TrueWoW_Launcher
 
         private void playButton_Click_1(object sender, EventArgs e)
         {
-            Environment.Exit(0);
+            ReadSettingsFile readedSettings = new ReadSettingsFile();
+            readedSettings.Read();
+            try
+            {
+                System.Diagnostics.Process.Start(readedSettings.wowPath() + "wow.exe");
+                this.Hide();
+                trayIcon.Visible = true;
+                trayIcon.ShowBalloonTip(1000);
+            }
+            catch (FileNotFoundException)
+            {
+                MessageBox.Show("ERROR: can't find wow.exe in: \n\n '" + readedSettings.wowPath() + "' \n\n Use settings button to set World of Warcraft directory!", "Error!");
+            }
         }
 
         private void closeButton_MouseHover(object sender, EventArgs e)
@@ -350,6 +487,47 @@ namespace TrueWoW_Launcher
         private void trayIcon_DoubleClick(object sender, EventArgs e)
         {
             this.Show();
+        }
+
+        private void newsLoopWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (true)
+            {
+                System.Threading.Thread.Sleep(5000);
+                newsLoopWorker.ReportProgress(1);
+            }
+        }
+
+        private void newsLoopWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            readedNews.Read();
+
+            newsSelector[newsSelectorHistory].BackColor = Color.Gray;
+
+            newsSelectorHistory++;
+            if (newsSelectorHistory >= readedNews.newsCount()) { newsSelectorHistory = 0; }
+
+            newsSelector[newsSelectorHistory].BackColor = Color.Aqua;
+
+            newsPicture.ImageLocation = @Directory.GetCurrentDirectory() + "\\news\\" + readedNews.newsImg(newsSelectorHistory);
+            newsTittleLabel.Text = readedNews.newsTittle(newsSelectorHistory);
+            newsTextLabel.Text = readedNews.newsText(newsSelectorHistory);
+        }
+
+        private void newsLoopWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+        }
+
+        private void newsTextLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void newsTittleLabel_Click(object sender, EventArgs e)
+        {
+            readedNews.Read();
+            System.Diagnostics.Process.Start(readedNews.newsLink(newsSelectorHistory));
         }
     }
 }
