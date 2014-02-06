@@ -218,7 +218,10 @@ namespace TrueWoW_Launcher
         private void newsBackgroundDownloader_DoWork(object sender, DoWorkEventArgs e)
         {
             settingsFile.Read();
-
+            if (File.Exists(@Directory.GetCurrentDirectory() + "\\news\\") == false)
+            {
+                Directory.CreateDirectory(@Directory.GetCurrentDirectory() + "\\news\\");
+            }
             WebClient _dlClient = new WebClient();
             _dlClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(_dlClientNews_DownloadProgressChanged);
             try

@@ -87,7 +87,6 @@ namespace TrueWoW_Launcher
             }
 
             //change control properties on runtime
-            playButtonHoover.Hide();
             //upArrowPicture.Parent = newsTextLabel;
             //upArrowPicture.Location = new Point(436, -2);
             //downArrowPicture.Parent = newsTextLabel;
@@ -210,16 +209,11 @@ namespace TrueWoW_Launcher
         private void playButtonLabel_MouseHover(object sender, EventArgs e)
         {
             MouseOverSound();
-
-            playButtonHoover.Hide();
-            playButton.Parent = playButtonHoover;
-            playButton.Location = new Point(7, 11);
-            //playButton.Image.
         }
 
         private void playButton_MouseDown(object sender, MouseEventArgs e)
         {
-            playButtonHoover.Location = new Point(playButtonHoover.Location.X + 1, playButtonHoover.Location.Y + 1);
+            playButton.Location = new Point(playButton.Location.X + 1, playButton.Location.Y + 1);
             SoundPlayer sPlayer = new SoundPlayer();
             sPlayer.SoundLocation = @Directory.GetCurrentDirectory() + "\\sound\\playButtonClick.wav";
             sPlayer.Play();
@@ -228,22 +222,8 @@ namespace TrueWoW_Launcher
 
         private void playButton_MouseUp(object sender, MouseEventArgs e)
         {
-            playButtonHoover.Location = new Point(playButtonHoover.Location.X - 1, playButtonHoover.Location.Y - 1);
+            playButton.Location = new Point(playButton.Location.X - 1, playButton.Location.Y - 1);
             //playButton.Location = new Point(playButton.Location.X - 1, playButton.Location.Y - 1);
-        }
-
-        private void playButton_MouseHover(object sender, EventArgs e)
-        {
-            playButtonHoover.Show();
-            playButton.Parent = playButtonHoover;
-            playButton.Location = new Point(7, 11);
-        }
-
-        private void playButton_MouseLeave(object sender, EventArgs e)
-        {
-            playButtonHoover.Hide();
-            playButton.Parent = this;
-            playButton.Location = new Point(694, 476);
         }
 
         private void upArrowPicture_MouseDown(object sender, MouseEventArgs e)
@@ -405,16 +385,27 @@ namespace TrueWoW_Launcher
         {
             ReadSettingsFile readedSettings = new ReadSettingsFile();
             readedSettings.Read();
-            try
+            if (readedSettings.wowPath() == "" || readedSettings.wowPath() == null)
             {
-                System.Diagnostics.Process.Start(readedSettings.wowPath() + "wow.exe");
-                this.Hide();
-                trayIcon.Visible = true;
-                trayIcon.ShowBalloonTip(1000);
+                MessageBox.Show("WoW dir not set! Configure it in settings menu.");
             }
-            catch (FileNotFoundException)
+            else
             {
-                MessageBox.Show("ERROR: can't find wow.exe in: \n\n '" + readedSettings.wowPath() + "' \n\n Use settings button to set World of Warcraft directory!", "Error!");
+                try
+                {
+                    System.Diagnostics.Process.Start(readedSettings.wowPath() + "wow.exe");
+                    this.Hide();
+                    trayIcon.Visible = true;
+                    trayIcon.ShowBalloonTip(1000);
+                }
+                catch (FileNotFoundException)
+                {
+                    MessageBox.Show("ERROR: can't find wow.exe in: \n\n '" + readedSettings.wowPath() + "' \n\n Use settings button to set World of Warcraft directory!", "Error!");
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    MessageBox.Show("ERROR: can't find wow.exe in: \n\n '" + readedSettings.wowPath() + "' \n\n Use settings button to set World of Warcraft directory!", "Error!");
+                }
             }
         }
 
@@ -427,7 +418,7 @@ namespace TrueWoW_Launcher
         private void closeButton_MouseLeave(object sender, EventArgs e)
         {
             closeButton.Size = new Size(32, 32);
-            closeButton.Location = new Point(1086, 28);
+            closeButton.Location = new Point(729, 12);
         }
 
         private void closeButton_MouseDown(object sender, MouseEventArgs e)
@@ -528,6 +519,26 @@ namespace TrueWoW_Launcher
         {
             readedNews.Read();
             System.Diagnostics.Process.Start(readedNews.newsLink(newsSelectorHistory));
+        }
+
+        private void menuButton3_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Coming soon!");
+        }
+
+        private void menuButton4_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("No function yet!");
+        }
+
+        private void menuButton5_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("No function yet!");
+        }
+
+        private void menuButton6_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("No function yet!");
         }
     }
 }

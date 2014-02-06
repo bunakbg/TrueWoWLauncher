@@ -133,8 +133,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Content Include="fonts\FRIZQT__.TTF" />
-    <Content Include="fonts\MORPHEUS.TTF" />
+    <EmbeddedResource Include="fonts\FRIZQT__.TTF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="fonts\MORPHEUS.TTF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -180,13 +184,35 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="img\downArrowDown.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="img\downArrowUp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="img\upArrowDown.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="img\upArrowUp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="localsettings.xml" />
     <Content Include="logo.ico" />
-    <Content Include="sound\mouseClick.wav" />
-    <Content Include="sound\mouseOver.wav" />
-    <Content Include="sound\newsSelectorClick.wav" />
-    <Content Include="sound\playButtonClick.wav" />
-    <Content Include="sound\startup.mp3" />
+    <EmbeddedResource Include="sound\mouseClick.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sound\mouseOver.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sound\newsSelectorClick.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sound\playButtonClick.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sound\startup.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PublishFile Include="localsettings.xml">
@@ -204,10 +230,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SereniaBLPLib\SereniaBLPLib.csproj">
-      <Project>{4ED9F877-A9BB-470F-B35C-694147472080}</Project>
-      <Name>SereniaBLPLib</Name>
-    </ProjectReference>
+    <Folder Include="news\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
